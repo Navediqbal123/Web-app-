@@ -6,7 +6,12 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Test endpoint to check env vars
+// ✅ Home route
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// ✅ Test endpoint to check env vars
 app.get("/api/env-check", (req, res) => {
   res.json({
     githubClientId: process.env.GITHUB_CLIENT_ID ? "✔️ Set" : "❌ Missing",
