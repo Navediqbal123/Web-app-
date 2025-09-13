@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Auto WebApp</title>
+  <title>🚀 Auto WebApp</title>
   <style>
     body {
       background: #0d1117;
@@ -27,6 +27,7 @@
       padding: 10px;
       border-radius: 8px;
       border: none;
+      outline: none;
     }
     button {
       margin-top: 10px;
@@ -34,7 +35,10 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      font-weight: bold;
     }
+    .email { background: #3b82f6; color: white; }
+    .google { background: #db4437; color: white; }
     .github { background: #24292f; color: white; }
     .supabase { background: #3ecf8e; color: black; }
   </style>
@@ -48,17 +52,62 @@
     <input type="password" id="password" placeholder="Enter password" />
     <input type="text" id="projectName" placeholder="Enter project name" />
 
-    <button class="github">🔗 Login with GitHub</button>
-    <button class="supabase">🔗 Connect Supabase</button>
+    <button class="email" onclick="signUpEmail()">📧 Sign Up with Email</button>
+    <button class="google" onclick="signInGoogle()">🔗 Login with Google</button>
+    <button class="github" onclick="signInGitHub()">🔗 Login with GitHub</button>
   </div>
 
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    async function checkEnv() {
-      let res = await fetch("/api/env-check");
-      let data = await res.json();
-      console.log("Env check:", data);
+    // ✅ Tumhara Supabase project ka URL aur Anon Key
+    const SUPABASE_URL = "https://jaxfffeuwzbwpiymhqkd.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpheGZmZmV1d3pid3BpeW1ocWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTExNzEsImV4cCI6MjA3MzE4NzE3MX0.5Mf2odRumkf85NfNc-JBYg0l9feCCmgLWYV1cDaraP0";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Email SignUp
+    async function signUpEmail() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      if (error) {
+        alert("Error: " + error.message);
+      } else {
+        alert("✅ Check your email to confirm sign-up!");
+        console.log(data);
+      }
     }
-    checkEnv();
+
+    // Google Login
+    async function signInGoogle() {
+      const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (error) alert("Error: " + error.message);
+    }
+
+    // GitHub Login
+    async function signInGitHub() {
+      const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        provider: "github",
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (error) alert("Error: " + error.message);
+    }
+
+    // Session Check
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        alert("✅ Logged in as " + session.user.email);
+        console.log(session);
+      }
+    });
   </script>
 </body>
 </html>
